@@ -10,9 +10,11 @@ contract NFT is ERC721, Ownable {
 
     constructor() ERC721("BasicNFT", "NFT") Ownable(msg.sender) {}
 
-    function mint(address to) external onlyOwner {
+    function mint(address to) external returns (uint256) {
         _mint(to, nextTokenId);
+        uint256 minted = nextTokenId;
         nextTokenId++;
+        return minted;
     }
 
     function _baseURI() internal view virtual override returns (string memory) {

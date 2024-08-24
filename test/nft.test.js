@@ -37,13 +37,6 @@ contract("NFT", accounts => {
     assert.strictEqual(newTokenId.toString(), '2', "Next token ID should be 2");
   });
 
-  // it("should not allow non-owners to mint tokens", async () => {
-  //   await truffleAssert.reverts(
-  //     nft.mint(nonOwner, { from: nonOwner }),
-  //     "Ownable: caller is not the owner"
-  //   );
-  // });
-
   it("should set and get base URI correctly", async () => {
     const newURI = "https://new-uri.xyz/";
     await nft.setBaseURI(newURI);
