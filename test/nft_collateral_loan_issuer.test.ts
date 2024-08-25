@@ -1,6 +1,6 @@
 
 import { LoanTokenContract, LoanTokenInstance } from '../types/truffle-contracts/LoanToken';
-import { NFTContract, NFTInstance } from '../types/truffle-contracts/NFT';
+import { AllEvents, NFTContract, NFTInstance } from '../types/truffle-contracts/NFT';
 import { NFTCollateralLoanIssuerContract, NFTCollateralLoanIssuerInstance } from '../types/truffle-contracts/NFTCollateralLoanIssuer';
 
 
@@ -27,7 +27,7 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     nftCollateralLoanIssuer = await NFTCollateralLoanIssuer.new(loanToken.address);
 
     // Mint an NFT to the borrower
-    const tx = await nft.mint(borrower);
+    const tx: Truffle.TransactionResponse<AllEvents> = await nft.mint(borrower);
 
     // Extract the token ID from the transaction receipt
     nftTokenId = tx.logs[0].args[0].toString();
@@ -47,7 +47,7 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     await nftCollateralLoanIssuer.collateralizeNFT(nft.address, nftTokenId, loanAmount, { from: borrower });
 
     // Check that the loan contract now owns the NFT
-    const newOwner = await nft.ownerOf(nftTokenId);
+    const newOwner: string = await nft.ownerOf(nftTokenId);
     assert.strictEqual(newOwner, nftCollateralLoanIssuer.address, "The NFT should be owned by the loan contract");
 
     // Check that the borrower received the ERC20 loan
@@ -72,7 +72,7 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     await nftCollateralLoanIssuer.repayLoan(nft.address, nftTokenId, { from: borrower });
 
     // Check that the borrower regained ownership of the NFT
-    const newOwner = await nft.ownerOf(nftTokenId);
+    const newOwner: string = await nft.ownerOf(nftTokenId);
     assert.strictEqual(newOwner, borrower, "The borrower should have regained ownership of the NFT");
 
     // Check that the loan contract has received the loan repayment
@@ -82,10 +82,10 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
 
   it("should allow the owner to liquidate the NFT if the loan is not repaid", async () => {
     // Mint a new NFT to the borrower
-    const tx = await nft.mint(borrower);
+    const tx: Truffle.TransactionResponse<AllEvents> = await nft.mint(borrower);
 
     // Extract the token ID from the transaction receipt
-    const newNftTokenId = tx.logs[0].args[0].toString();
+    const newNftTokenId: string = tx.logs[0].args[0].toString();
     
     // Verify the token ID
     assert.ok(nftTokenId, "Token ID should be obtained");
@@ -98,7 +98,7 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     await nftCollateralLoanIssuer.liquidateNFT(nft.address, newNftTokenId, { from: owner });
 
     // Check that the contract owner now owns the NFT
-    const newOwner = await nft.ownerOf(newNftTokenId);
+    const newOwner: string = await nft.ownerOf(newNftTokenId);
     assert.strictEqual(newOwner, owner, "The contract owner should have received the liquidated NFT");
   });
 });

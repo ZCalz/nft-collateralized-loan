@@ -61,10 +61,10 @@ cd nft-collateralized-loan
 
 ### 2. Install Project Dependencies
 
-Install the project dependencies using npm:
+Install the project dependencies and generate types using npm:
 
 ```bash
-npm install
+npm install && npm run postinstall
 ```
 
 Copy the environment variables into an env file:
