@@ -41,10 +41,10 @@
  * https://trufflesuite.com/docs/truffle/getting-started/using-the-truffle-dashboard/
  */
 
-// require('dotenv').config();
-// const { MNEMONIC, PROJECT_ID } = process.env;
+require('dotenv').config(); 
+const { PK, PROJECT_ID } = process.env;
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
   /**
@@ -64,11 +64,33 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
-    // development: {
-    //  host: "127.0.0.1",     // Localhost (default: none)
-    //  port: 8545,            // Standard Ethereum port (default: none)
-    //  network_id: "*",       // Any network (default: none)
-    // },
+    development: {
+     host: "127.0.0.1",     // Localhost (default: none)
+     port: 8545,            // Standard Ethereum port (default: none)
+     network_id: "*",       // Any network (default: none)
+    },
+    lineaSepolia: {
+      provider: () => new HDWalletProvider({
+        privateKeys: [`${PK}`], // Replace with your private key
+        providerOrUrl: `https://linea-sepolia.infura.io/v3/${PROJECT_ID}`//'https://rpc.sepolia.linea.build' 
+      }),
+      gas: 9000000, 
+      network_id: 59141, 
+      confirmations: 2,    
+      timeoutBlocks: 500,  
+      skipDryRun: true  
+    },
+    sepolia: {
+      provider: () => new HDWalletProvider({
+        privateKeys: [`${PK}`], // Replace with your private key
+        providerOrUrl: `https://sepolia.infura.io/v3/${PROJECT_ID}` 
+      }),
+      network_id: 11155111,  
+      gas: 9000000,    
+      confirmations: 2,    
+      timeoutBlocks: 500,  
+      skipDryRun: true     
+    },
     //
     // An additional network, but with some advanced options…
     // advanced: {
@@ -108,14 +130,14 @@ module.exports = {
     solc: {
       version: "0.8.21",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+         enabled: true,
+         runs: 300
+       },
       //  evmVersion: "byzantium"
-      // }
-    }
+      },
+    },
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:

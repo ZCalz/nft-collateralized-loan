@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract NFT is ERC721, Ownable {
     uint256 public nextTokenId;
     string public baseURI = "https://tempory-uri.xyz/";
+
+    error NotOwner();
 
     constructor() ERC721("BasicNFT", "NFT") Ownable(msg.sender) {}
 
@@ -21,7 +23,8 @@ contract NFT is ERC721, Ownable {
         return baseURI;
     }
 
-    function setBaseURI(string memory newURI) external onlyOwner {
-       baseURI = newURI;
+    function setBaseURI(string memory newURI) external {
+        if (msg.sender != owner()) revert NotOwner(); 
+        baseURI = newURI;
     }
 }
