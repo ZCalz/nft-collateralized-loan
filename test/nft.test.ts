@@ -1,5 +1,6 @@
-const NFT = artifacts.require("NFT");
-const assert = require('assert');
+import { NFTContract, NFTInstance } from '../types/truffle-contracts/NFT';
+
+const NFT: NFTContract = artifacts.require("NFT");
 const truffleAssert = require('truffle-assertions');
 
 /*
@@ -9,7 +10,7 @@ const truffleAssert = require('truffle-assertions');
  */
 contract("NFT", accounts => {
   const [owner, nonOwner] = accounts;
-  let nft;
+  let nft: NFTInstance;
 
   beforeEach(async () => {
     nft = await NFT.new();

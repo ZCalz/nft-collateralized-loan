@@ -1,0 +1,1 @@
+module.exports = require("./deploy_loan_token")(artifacts, web3);

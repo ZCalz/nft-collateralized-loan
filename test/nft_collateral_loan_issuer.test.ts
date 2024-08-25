@@ -1,15 +1,21 @@
-const NFTCollateralLoanIssuer = artifacts.require("NFTCollateralLoanIssuer");
-const NFT = artifacts.require("NFT");
-const LoanToken = artifacts.require("LoanToken");
+
+import { LoanTokenContract, LoanTokenInstance } from '../types/truffle-contracts/LoanToken';
+import { NFTContract, NFTInstance } from '../types/truffle-contracts/NFT';
+import { NFTCollateralLoanIssuerContract, NFTCollateralLoanIssuerInstance } from '../types/truffle-contracts/NFTCollateralLoanIssuer';
+
+
+const NFTCollateralLoanIssuer: NFTCollateralLoanIssuerContract = artifacts.require("NFTCollateralLoanIssuer");
+const NFT: NFTContract = artifacts.require("NFT");
+const LoanToken: LoanTokenContract = artifacts.require("LoanToken");
 const truffleAssert = require('truffle-assertions');
 
 contract("NFTCollateralLoanIssuer", (accounts) => {
   const [owner, borrower, nonBorrower] = accounts;
 
-  let nftCollateralLoanIssuer;
-  let nft;
-  let loanToken;
-  let nftTokenId;
+  let nftCollateralLoanIssuer: NFTCollateralLoanIssuerInstance;
+  let nft: NFTInstance;
+  let loanToken: LoanTokenInstance;
+  let nftTokenId: string;
   const loanAmount = web3.utils.toWei('100', 'ether'); // 100 ERC20 tokens
 
   before(async () => {

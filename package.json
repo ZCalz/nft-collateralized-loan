@@ -1,8 +1,23 @@
 {
+  "type": "commonjs",
+  "scripts": {
+    "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
+    "postinstall": "npx truffle compile && npm run generate-types"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
     "@truffle/hdwallet-provider": "^2.1.15",
     "dotenv": "^16.4.5",
     "truffle-assertions": "^0.9.2"
+  },
+  "devDependencies": {
+    "@typechain/truffle-v5": "^8.0.7",
+    "@types/chai": "^4.3.17",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "^22.5.0",
+    "truffle": "^5.11.5",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.5.4"
   }
 }

@@ -1,17 +1,12 @@
-const LoanToken = artifacts.require("LoanToken");
-const assert = require('assert');
 
-/*
- * uncomment accounts to access the test accounts made available by the
- * Ethereum client
- * See docs: https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
- */
+import { LoanTokenInstance, LoanTokenContract } from '../types/truffle-contracts/LoanToken';
+const LoanToken: LoanTokenContract = artifacts.require("LoanToken");
 
 contract("LoanToken", async (accounts) => {
   const [deployer, recipient] = accounts;
   const initialSupply = web3.utils.toBN('1000000'); // 1 million tokens with 18 decimals
 
-  let loanToken;
+  let loanToken: LoanTokenInstance;
 
   beforeEach(async () => {
     loanToken = await LoanToken.new(initialSupply);
