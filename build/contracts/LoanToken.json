@@ -9784,12 +9784,12 @@
         }
       },
       "links": {},
-      "address": "0xC6bDbB52671D546F9701BbC92E979BdFcBa5FceE",
-      "transactionHash": "0xc65035c524e7cac63b4b252680254886ec2365767d3192cdd7a2b2fbc7e5bedc"
+      "address": "0x24f24fd71B1a5322d423CaE74B57457b6dB94675",
+      "transactionHash": "0x5f3ab2750a9772357f9e508d54e8f51579d7e46adcbfd9002aec221fbd6e95ca"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-08-25T01:55:07.279Z",
+  "updatedAt": "2024-08-25T04:27:04.314Z",
   "networkType": "ethereum",
   "devdoc": {
     "events": {

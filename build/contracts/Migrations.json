@@ -1778,12 +1778,12 @@
     "1724454583434": {
       "events": {},
       "links": {},
-      "address": "0x5E77583D87889b4C0cd7b3D56eE36A92130346FC",
-      "transactionHash": "0x4fee709691b1e8e5947f6de39737392dcd3970d019ec92d110e74dbc6eaa0833"
+      "address": "0x52b2E297B8604Db2B05369049bD6Ecbf84D9Cb22",
+      "transactionHash": "0x6578a8ae7b8aad8a35a265876e4aef7830f945d16dd2fa8bff2bdcf69e8f7660"
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-08-25T01:55:07.294Z",
+  "updatedAt": "2024-08-25T04:27:04.333Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

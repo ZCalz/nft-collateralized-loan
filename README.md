@@ -31,6 +31,21 @@ Before you begin, ensure you have the following software installed:
 
    Download Ganache from the [official website](https://www.trufflesuite.com/ganache) and install it.
 
+   Or install from terminal:
+
+   ```bash
+   npm i -g ganache
+   ```
+3. **Install Fuzzing Tooling:**
+
+    ```bash
+    pip3 install diligence-fuzzing
+    npm i -g eth-scribble
+    ```
+
+    Follow the rest of the steps here on the Diligence [official website](https://fuzzing-docs.diligence.tools/getting-started/fuzzing-non-foundry-projects)
+
+
 ## Project Setup
 
 Follow these steps to set up and run the project:
@@ -123,6 +138,23 @@ Run the tests to ensure everything is working correctly:
 
 ```bash
 truffle test --network development
+```
+
+### 7. Using Fuzzer
+
+Arming:
+```bash
+fuzz arm contracts/NFTCollateralLoanIssuer.sol contracts/NFT.sol
+```
+
+Disarming:
+```bash
+fuzz disarm contracts/NFTCollateralLoanIssuer.sol contracts/NFT.sol
+```
+
+Run:
+```bash
+fuzz run
 ```
 
 ## Additional Commands
