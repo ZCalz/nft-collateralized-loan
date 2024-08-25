@@ -26,8 +26,8 @@ contract NFT is ERC721, Ownable {
         RET_0 = _original_NFT_mint(to);
         unchecked {
             if (!(nextTokenId == (_v.old_0 + 1))) {
-                emit __ScribbleUtilsLib__2943.AssertionFailedData(0, abi.encode(nextTokenId));
-                emit __ScribbleUtilsLib__2943.AssertionFailed("000913:0068:000 0: ");
+                emit __ScribbleUtilsLib__2944.AssertionFailedData(0, abi.encode(nextTokenId));
+                emit __ScribbleUtilsLib__2944.AssertionFailed("000913:0068:000 0: ");
             }
         }
     }
@@ -35,7 +35,7 @@ contract NFT is ERC721, Ownable {
     function _original_NFT_mint(address to) internal returns (uint256) {
         _mint(to, nextTokenId);
         uint256 minted = nextTokenId;
-        nextTokenId++;
+        nextTokenId += 1;
         return minted;
     }
 
@@ -47,11 +47,11 @@ contract NFT is ERC721, Ownable {
         _original_NFT_setBaseURI(newURI);
         unchecked {
             if (!(msg.sender == owner())) {
-                emit __ScribbleUtilsLib__2943.AssertionFailed("001501:0068:000 1: ");
+                emit __ScribbleUtilsLib__2944.AssertionFailed("001504:0068:000 1: ");
             }
             if (!(keccak256(bytes(baseURI)) == keccak256(bytes(newURI)))) {
-                emit __ScribbleUtilsLib__2943.AssertionFailedData(2, abi.encode(baseURI, newURI));
-                emit __ScribbleUtilsLib__2943.AssertionFailed("001776:0068:000 2: ");
+                emit __ScribbleUtilsLib__2944.AssertionFailedData(2, abi.encode(baseURI, newURI));
+                emit __ScribbleUtilsLib__2944.AssertionFailed("001779:0068:000 2: ");
             }
         }
     }
@@ -62,7 +62,7 @@ contract NFT is ERC721, Ownable {
     }
 }
 
-library __ScribbleUtilsLib__2943 {
+library __ScribbleUtilsLib__2944 {
     event AssertionFailed(string message);
 
     event AssertionFailedData(int eventId, bytes encodingData);
