@@ -5,7 +5,7 @@
 This README provides instructions for setting up and running this project. It includes prerequisites, installation steps, and how to start a local blockchain, run tests, and deploy contracts.
 
 To run the frontend make sure to complete steps 1-5 first and then go to step 7. You can also checkout a live version of the site here: 
-[Live Site](https://zcalz.github.io/nft-collateralized-loan)
+[Live Site](https://nft-collateralized-loan.vercel.app/)
 
 ## Prerequisites
 

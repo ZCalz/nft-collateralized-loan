@@ -4,14 +4,18 @@
   "private": true,
   "author": "ZCalz",
   "license": "Unlicense",
-  "homepage": "https://zcalz.github.io/",
   "type": "commonjs",
   "scripts": {
     "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
     "postinstall": "npx truffle compile && npm run generate-types",
-    "build:frontend": "cd frontend && npm run build",
-    "deploy": "gh-pages -d frontend/dist"
+    "build:frontend": "npm run build --workspace=frontend",
+    "deploy:frontend": "gh-pages -d frontend/dist",
+    "ui": "npm run dev --workspace=frontend"
   },
+  "workspaces": [
+    ".",
+    "frontend"
+  ],
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
     "@truffle/hdwallet-provider": "^2.1.15",

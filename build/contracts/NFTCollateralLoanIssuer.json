@@ -117,7 +117,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -156,7 +157,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -169,7 +171,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -551,12 +554,7 @@
       "contents": "{\n    { }\n    function abi_decode_tuple_t_contract$_IERC20_$190_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n        value0 := value\n    }\n}",
       "id": 15,
       "language": "Yul",
-      "name": "#utility.yul",
-      "db": {
-        "source": {
-          "id": "0xa8626bf009c191f4ca6131eaf5b4b932143132ef3be193d283bdd9ed9ad9a47a"
-        }
-      }
+      "name": "#utility.yul"
     }
   ],
   "deployedGeneratedSources": [
@@ -3511,12 +3509,7 @@
       "contents": "{\n    { }\n    function abi_decode_address(offset) -> value\n    {\n        value := calldataload(offset)\n        if iszero(eq(value, and(value, 0xffffffffffffffffffffffffffffffffffffffff))) { revert(0, 0) }\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        value0 := abi_decode_address(headStart)\n    }\n    function abi_decode_tuple_t_addresst_uint256(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        value0 := abi_decode_address(headStart)\n        value1 := calldataload(add(headStart, 32))\n    }\n    function abi_decode_tuple_t_addresst_uint256t_uint256(headStart, dataEnd) -> value0, value1, value2\n    {\n        if slt(sub(dataEnd, headStart), 96) { revert(0, 0) }\n        value0 := abi_decode_address(headStart)\n        value1 := calldataload(add(headStart, 32))\n        value2 := calldataload(add(headStart, 64))\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffffffffffffffffffffffffffffffffffffffff))\n    }\n    function abi_encode_tuple_t_address_t_address_t_uint256__to_t_address_t_address_t_uint256__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := 0xffffffffffffffffffffffffffffffffffffffff\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), value2)\n    }\n    function abi_encode_tuple_t_address_t_uint256__to_t_address_t_uint256__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        mstore(headStart, and(value0, 0xffffffffffffffffffffffffffffffffffffffff))\n        mstore(add(headStart, 32), value1)\n    }\n    function abi_encode_tuple_t_address_t_uint256_t_uint256_t_bool__to_t_address_t_uint256_t_uint256_t_bool__fromStack_reversed(headStart, value3, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 128)\n        mstore(headStart, and(value0, 0xffffffffffffffffffffffffffffffffffffffff))\n        mstore(add(headStart, 32), value1)\n        mstore(add(headStart, 64), value2)\n        mstore(add(headStart, 96), iszero(iszero(value3)))\n    }\n    function abi_encode_tuple_t_contract$_IERC20_$190__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xffffffffffffffffffffffffffffffffffffffff))\n    }\n    function abi_encode_tuple_t_stringliteral_1fa31cb96a160806058827499e615709609a4ddb7b5f15d87520f97ef0de4d6b__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 29)\n        mstore(add(headStart, 64), \"NFT is already collateralized\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_245f15ff17f551913a7a18385165551503906a406f905ac1c2437281a7cd0cfe__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 38)\n        mstore(add(headStart, 64), \"Ownable: new owner is the zero a\")\n        mstore(add(headStart, 96), \"ddress\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_295dc4c7cf67879972117851179971bda0626d902ff6fa0440a0b23c4b08050a__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 18)\n        mstore(add(headStart, 64), \"Loan is not active\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_stringliteral_5dd6e940935b1281ca24aea546ec22a8266a2523d23030a8b44fefc06f7fb89b__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 36)\n        mstore(add(headStart, 64), \"Only the borrower can repay the \")\n        mstore(add(headStart, 96), \"loan\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_stringliteral_9924ebdf1add33d25d4ef888e16131f0a5687b0580a36c21b5c301a6c462effe__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 32)\n        mstore(add(headStart, 64), \"Ownable: caller is not the owner\")\n        tail := add(headStart, 96)\n    }\n    function abi_encode_tuple_t_uint256__to_t_uint256__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n}",
       "id": 15,
       "language": "Yul",
-      "name": "#utility.yul",
-      "db": {
-        "source": {
-          "id": "0xd3c97821277e49a1012c3eea5b60f04ac4490804e0cf8f4f7539d4c305f819d2"
-        }
-      }
+      "name": "#utility.yul"
     }
   ],
   "sourceMap": "227:3221:14:-:0;;;1014:70;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::i;:::-;936:32:0;719:10:7;936:18:0;:32::i;:::-;1055:9:14;:22;;-1:-1:-1;;;;;;1055:22:14;-1:-1:-1;;;;;1055:22:14;;;;;;;;;;227:3221;;2426:187:0;2499:16;2518:6;;-1:-1:-1;;;;;2534:17:0;;;-1:-1:-1;;;;;;2534:17:0;;;;;;2566:40;;2518:6;;;;;;;2566:40;;2499:16;2566:40;2489:124;2426:187;:::o;14:304:15:-;98:6;151:2;139:9;130:7;126:23;122:32;119:52;;;167:1;164;157:12;119:52;193:16;;-1:-1:-1;;;;;238:31:15;;228:42;;218:70;;284:1;281;274:12;218:70;307:5;14:304;-1:-1:-1;;;14:304:15:o;:::-;227:3221:14;;;;;;",
@@ -6960,10 +6953,105 @@
       "transactionHash": "0xb3f009ae5299333ddf0ef64a218463f533e6f18fd32ca7ff0696ad217234f5a0"
     },
     "59141": {
-      "events": {},
+      "events": {
+        "0x4ff1bde1d2bfa65462ed9c225b57b8446fe13abb1e46a9aa6161768bf59ed6d7": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "borrower",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "nftAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "loanAmount",
+              "type": "uint256"
+            }
+          ],
+          "name": "LoanCreated",
+          "type": "event"
+        },
+        "0xfe3c4f4ff6f11a42f9d84f777002ab405a07fc0075a3504d153b0587f61f460e": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "borrower",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "nftAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "LoanRepaid",
+          "type": "event"
+        },
+        "0x1de6f257258c4e8f8e5d4511fb425ba216600e9cf6a2b4628322c0b5b469956f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "nftAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "NFTLiquidated",
+          "type": "event"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        }
+      },
       "links": {},
-      "address": "0x92A6FfFE845cC1b88d03f7A4fAAc63C65b525095",
-      "transactionHash": "0x0a8cc57e5e87eb1bf99185b4bba7cbf99202a14ed625baf6d88b3682df1c35ef"
+      "address": "0xaEFe5ec93a24fB8E52C4C77b052b65a0d4889B0f",
+      "transactionHash": "0x2ad88ef2dde6bda3609d8e0bda59751cf7e521043bc74ce53b703762c181f743"
     },
     "11155111": {
       "events": {},
@@ -7074,7 +7162,8 @@
     }
   },
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-08-27T00:35:14.911Z",
+  "updatedAt": "2024-08-27T17:30:35.068Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {
@@ -7104,16 +7193,5 @@
       }
     },
     "version": 1
-  },
-  "db": {
-    "callBytecode": {
-      "id": "0xd4d4668145d60447928c3e46b49cba14debc564ff1fbaa6fe703a074aeb5111b"
-    },
-    "createBytecode": {
-      "id": "0x111d69218c9d0d1c9886fa69224de0733c233e15501b484d92e46d7cb9483933"
-    },
-    "contract": {
-      "id": "0x1d5a05d87b5130d272b98e936a8fd054d3617ca8f64d7c243e5a6d39ae716cfb"
-    }
   }
 }
