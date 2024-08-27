@@ -1,8 +1,16 @@
 {
+  "name": "nft-collateralized-loan",
+  "version": "0.1.0",
+  "private": true,
+  "author": "ZCalz",
+  "license": "Unlicense",
+  "homepage": "https://zcalz.github.io/",
   "type": "commonjs",
   "scripts": {
     "generate-types": "npx typechain --target=truffle-v5 'build/contracts/*.json'",
-    "postinstall": "npx truffle compile && npm run generate-types"
+    "postinstall": "npx truffle compile && npm run generate-types",
+    "build:frontend": "cd frontend && npm run build",
+    "deploy": "gh-pages -d frontend/dist"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
@@ -15,6 +23,7 @@
     "@types/chai": "^4.3.17",
     "@types/mocha": "^10.0.7",
     "@types/node": "^22.5.0",
+    "gh-pages": "^6.1.1",
     "truffle": "^5.11.5",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",

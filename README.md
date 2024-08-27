@@ -4,6 +4,9 @@
 
 This README provides instructions for setting up and running this project. It includes prerequisites, installation steps, and how to start a local blockchain, run tests, and deploy contracts.
 
+To run the frontend make sure to complete steps 1-5 first and then go to step 7. You can also checkout a live version of the site here: 
+[Live Site](https://zcalz.github.io/nft-collateralized-loan)
+
 ## Prerequisites
 
 Before you begin, ensure you have the following software installed:
@@ -156,6 +159,23 @@ Run:
 ```bash
 fuzz run
 ```
+
+### 8. Running The Frontend
+
+Make sure to complete step `1`-`5` before running the frontend. The frontend depends on the generate contract artifacts, deployment addresses and typeschain types. 
+
+Change into the frontend directory:
+
+```bash
+cd frontend
+```
+Then run:
+
+```bash
+npm i && npm run start
+```
+
+The frontend will be running on `localhost:5173/`
 
 ## Additional Commands
 

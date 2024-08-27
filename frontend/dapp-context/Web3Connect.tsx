@@ -38,7 +38,7 @@ const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [ nftCollateralLoanIssuerTxContract, setNftCollateralLoanIssuerTxContract ] = useState<ethers.Contract | null>(null);
   const [ loanTokenTxContract, setLoanTokenTxContract ] = useState<ethers.Contract | null>(null);
 
-  const { Nft, LoanToken, NFTCollateralLoanIssuer } = NetworkMap.DEVELOPMENT
+  const { Nft, LoanToken, NFTCollateralLoanIssuer } = NetworkMap.LINEA_SEPOLIA
   console.log('network addresses: ', {
     Nft, LoanToken, NFTCollateralLoanIssuer
   })
