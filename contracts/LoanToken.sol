@@ -7,4 +7,12 @@ contract LoanToken is ERC20 {
     constructor(uint256 initialSupply) ERC20("LoanToken", "LTKN") {
         _mint(msg.sender, initialSupply * (10 ** decimals()));
     }
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+
+    function burn(uint256 amount) external {
+        _burn(msg.sender, amount);
+    }
 }

@@ -38,6 +38,10 @@ const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [ nftCollateralLoanIssuerTxContract, setNftCollateralLoanIssuerTxContract ] = useState<ethers.Contract | null>(null);
   const [ loanTokenTxContract, setLoanTokenTxContract ] = useState<ethers.Contract | null>(null);
 
+  const { Nft, LoanToken, NFTCollateralLoanIssuer } = NetworkMap.DEVELOPMENT
+  console.log('network addresses: ', {
+    Nft, LoanToken, NFTCollateralLoanIssuer
+  })
   // Function to connect to the wallet
   const connectWallet = async () => {
     try {
@@ -71,26 +75,26 @@ const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
 
     if (signer && nftTxContract === null) {
-      const transactionContract = new ethers.Contract(NetworkMap["DEVELOPMENT"].Nft, NFTAbi, signer);
+      const transactionContract = new ethers.Contract(Nft, NFTAbi, signer);
       setNftTxContract(transactionContract);
       console.log("transactionContract NFT: ", transactionContract);
     }
 
-    if (signer && nftTxContract === null) {
-      const transactionContract = new ethers.Contract(NetworkMap["DEVELOPMENT"].LoanToken, LoanTokenAbi, signer);
+    if (signer && loanTokenTxContract === null) {
+      const transactionContract = new ethers.Contract(LoanToken, LoanTokenAbi, signer);
       setLoanTokenTxContract(transactionContract);
       console.log("transactionContract LoanToken: ", transactionContract);
     }
 
 
-    if (signer && nftTxContract === null) {
-      const transactionContract = new ethers.Contract(NetworkMap["DEVELOPMENT"].NFTCollateralLoanIssuer, NFTCollateralLoanIssuerAbi, signer);
+    if (signer && nftCollateralLoanIssuerTxContract === null) {
+      const transactionContract = new ethers.Contract(NFTCollateralLoanIssuer, NFTCollateralLoanIssuerAbi, signer);
       setNftCollateralLoanIssuerTxContract(transactionContract);
       console.log("transactionContract NFTCollateralLoanIssuer: ", transactionContract);
     }
 
 
-  }, [provider, signer, nftTxContract]);
+  }, [provider, signer, nftTxContract, loanTokenTxContract, nftCollateralLoanIssuerTxContract, Nft, LoanToken, NFTCollateralLoanIssuer]);
 
   return (
     <WalletContext.Provider value={{ provider, signer, account, connectWallet, nftTxContract, loanTokenTxContract, nftCollateralLoanIssuerTxContract }}>
