@@ -1,6 +1,14 @@
 import { useState, useEffect, useContext } from "react"
 import { WalletContext } from "../dapp-context/Web3Connect"
 import { ethers } from 'ethers';
+import toast, { Toaster } from 'react-hot-toast';
+
+type LoanInfo = {
+  borrower: string
+  loanAmount: number
+  nftAddress: string
+  tokenId: number
+}
 
 export default function App() {
   const walletContext = useContext(WalletContext);
@@ -8,15 +16,17 @@ export default function App() {
     throw new Error("WalletInfo must be used within a WalletProvider");
   }
   const { nftTxContract, loanTokenTxContract, nftCollateralLoanIssuerTxContract, account, provider,  } = walletContext;
-  const [userNFTs, setUserNFTs] = useState<number[] | null>(null)
+  const [userNFTs, setUserNFTs] = useState<number[] | undefined>(undefined)
   const [userLoanTokens, setUserLoanTokens] = useState<string>('0')
   const [dappBalance, setDappBalance] = useState<string>('0')
-  const [selectedValue, setSelectedValue] = useState<string | undefined>(undefined);
+  const [selectedNFT, setSelectedNFT] = useState<string | undefined>(undefined);
+  const [userLoanInfo, setUserLoanInfo] = useState<LoanInfo[] | undefined>(undefined);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setSelectedValue(value);
+    setSelectedNFT(value);
   };
+  console.log("selectedNFT: ", selectedNFT)
 
   const collateralizeNFT = async (nftTokenId: number, loanAmount: number) => {
     const amt = ethers.utils.parseEther(String(loanAmount))
@@ -24,12 +34,26 @@ export default function App() {
       try { 
         const approveTx = await nftTxContract.approve(nftCollateralLoanIssuerTxContract.address, nftTokenId);
         approveTx.wait()
-        console.log("approved nft for loan")
+        toast.success('approved nft for loan');
         const collateralizeTx = await nftCollateralLoanIssuerTxContract.collateralizeNFT(nftTxContract.address, nftTokenId, amt);
         collateralizeTx.wait()
-        console.log("collateralized nft")
+        toast.success('collateralized nft');
       } catch (error) {
         console.error("Error collateralizing NFT:", error);
+        toast.error('Error collateralizing NFT');
+      }
+    }
+  };
+
+  const mintNFT = async () => {
+    if (account && nftTxContract) {
+      try { 
+        const mintTx = await nftTxContract.mint(account);
+        mintTx.wait()
+        toast.success('minted nft');
+      } catch (error) {
+        console.error("Error mint NFT:", error);
+        toast.error('Error mint NFT');
       }
     }
   };
@@ -88,16 +112,23 @@ export default function App() {
           const issuerAddress = nftCollateralLoanIssuerTxContract.address
           console.log("issuerAddress: ", issuerAddress);
 
-          const events = await nftCollateralLoanIssuerTxContract.queryFilter("LoanCreated", 0, "latest");
-
-          console.log("events: ", events);
-          events.forEach((event) => {
+          const events: ethers.Event[] = await nftCollateralLoanIssuerTxContract.queryFilter("LoanCreated", 0, "latest");
+          const loans: LoanInfo[] = [];
+          events.forEach((event: ethers.Event) => {
             if (event && event.args) {
               const { borrower, loanAmount, nftAddress, tokenId } = event.args
-              console.log(event, borrower, loanAmount, nftAddress, tokenId)
-  
+              console.log({borrower, loanAmount, nftAddress, tokenId})
+              const loanInfo: LoanInfo = {
+                borrower: borrower,
+                loanAmount: Number(ethers.utils.formatEther(loanAmount)),
+                nftAddress: nftAddress,
+                tokenId: Number(tokenId),
+              }
+              loans.push(loanInfo);
             }
           });
+
+          setUserLoanInfo(loans)
         } catch (err) {
           console.error(err)
         }
@@ -130,7 +161,14 @@ export default function App() {
           <div className="w-full h-full p-4">
             <h2 className="font-bold">Your Loans</h2>
             <div className="p-4">
-              {}
+              {userLoanInfo && userLoanInfo.map((loan, key) => {
+                return<div key={key} className="bg-yellow-800 p-4 rounded-md shadow-md">
+                  <p>Borrower: {loan.borrower}</p>
+                  <p>LoanAmount: {loan.loanAmount}</p>
+                  <p>NftAddress: {loan.nftAddress}</p>
+                  <p>TokenId: {loan.tokenId}</p>
+                </div>
+              })}
             </div>
           </div>
         </div>
@@ -141,17 +179,17 @@ export default function App() {
               <label htmlFor="options" className="block mt-4 my-2 text-sm font-medium text-gray-900">Choose an nft to collateralize:</label>
               <select
                 id="options"
-                value={selectedValue}
+                value={selectedNFT}
                 onChange={handleChange}
                 className="block text-black w-full py-2 border border-gray-300 rounded-md"
               >
-                {userNFTs && userNFTs.map((option, index) => (
+                {userNFTs && ["None",...userNFTs].map((option, index) => (
                   <option key={index} value={option}>
                     {option}
                   </option>
                 ))}
               </select>
-              <button className="bg-yellow-600 p-4 px-8 rounded-md shadow-md" onClick={()=>collateralizeNFT(4, 1000)} >Submit</button>
+              <button className="bg-yellow-600 p-4 px-8 rounded-md shadow-md" onClick={selectedNFT? ()=>{ collateralizeNFT(Number(selectedNFT), 1000)}: undefined} >Submit</button>
             </div>
           </div>
         </div>
@@ -172,7 +210,7 @@ export default function App() {
               <h3 className="py-4 font-bold">Your Loan Token Amount: {userLoanTokens}</h3>
             </div>
             <div className="flex justify-evenly text-gray-200 gap-6 flex-col sm:flex-row">
-              <button className="bg-green-600 p-8 rounded-md shadow-md">Mint NFT</button>
+              <button onClick={()=>mintNFT()} className="bg-green-600 p-8 rounded-md shadow-md">Mint NFT</button>
               <button className="bg-pink-600 p-8 rounded-md shadow-md">Burn 10000 of Your Loan Tokens</button>
               <button className="bg-pink-600 p-8 rounded-md shadow-md">Burn All Your Loan Tokens</button>
               <button className="bg-pink-600 p-8 rounded-md shadow-md">Mint Yourself 10000 Loan Tokens</button>
@@ -180,6 +218,10 @@ export default function App() {
           </div>
         </div>
       </span>
+      <Toaster
+          position="top-center"
+          reverseOrder={false}
+        />
     </div>
   )
 }
