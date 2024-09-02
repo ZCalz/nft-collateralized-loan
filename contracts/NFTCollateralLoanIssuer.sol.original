@@ -78,6 +78,10 @@ contract NFTCollateralLoanIssuer is Ownable {
         require(loan.isActive, "Loan is not active");
         require(msg.sender == loan.borrower, "Only the borrower can repay the loan");
 
+        // Check that msg.sender has enough loan tokens to repay the loan
+        uint256 senderBalance = loanToken.balanceOf(msg.sender);
+        require(senderBalance >= loan.loanAmount, "Insufficient loan token balance to repay the loan");
+
         // Transfer the loan amount back to the contract
         loanToken.transferFrom(msg.sender, address(this), loan.loanAmount);
 

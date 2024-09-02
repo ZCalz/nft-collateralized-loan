@@ -35,12 +35,12 @@ contract NFTCollateralLoanIssuer is Ownable {
         _original_NFTCollateralLoanIssuer_collateralizeNFT(nftAddress, tokenId, loanAmount);
         unchecked {
             if (!(loans[nftAddress][tokenId].isActive == false)) {
-                emit __ScribbleUtilsLib__3238.AssertionFailedData(3, abi.encode(nftAddress, tokenId));
-                emit __ScribbleUtilsLib__3238.AssertionFailed("001523:0068:001 3: ");
+                emit __ScribbleUtilsLib__3254.AssertionFailedData(3, abi.encode(nftAddress, tokenId));
+                emit __ScribbleUtilsLib__3254.AssertionFailed("001523:0068:001 3: ");
             }
             if (!(loans[nftAddress][tokenId].borrower == msg.sender)) {
-                emit __ScribbleUtilsLib__3238.AssertionFailedData(4, abi.encode(nftAddress, tokenId));
-                emit __ScribbleUtilsLib__3238.AssertionFailed("001798:0068:001 4: ");
+                emit __ScribbleUtilsLib__3254.AssertionFailedData(4, abi.encode(nftAddress, tokenId));
+                emit __ScribbleUtilsLib__3254.AssertionFailed("001798:0068:001 4: ");
             }
         }
     }
@@ -60,12 +60,12 @@ contract NFTCollateralLoanIssuer is Ownable {
         _original_NFTCollateralLoanIssuer_repayLoan(nftAddress, tokenId);
         unchecked {
             if (!(loans[nftAddress][tokenId].isActive == false)) {
-                emit __ScribbleUtilsLib__3238.AssertionFailedData(5, abi.encode(nftAddress, tokenId));
-                emit __ScribbleUtilsLib__3238.AssertionFailed("003049:0068:001 5: ");
+                emit __ScribbleUtilsLib__3254.AssertionFailedData(5, abi.encode(nftAddress, tokenId));
+                emit __ScribbleUtilsLib__3254.AssertionFailed("003049:0068:001 5: ");
             }
             if (!(msg.sender == loans[nftAddress][tokenId].borrower)) {
-                emit __ScribbleUtilsLib__3238.AssertionFailedData(6, abi.encode(nftAddress, tokenId));
-                emit __ScribbleUtilsLib__3238.AssertionFailed("003324:0068:001 6: ");
+                emit __ScribbleUtilsLib__3254.AssertionFailedData(6, abi.encode(nftAddress, tokenId));
+                emit __ScribbleUtilsLib__3254.AssertionFailed("003324:0068:001 6: ");
             }
         }
     }
@@ -74,6 +74,8 @@ contract NFTCollateralLoanIssuer is Ownable {
         Loan storage loan = loans[nftAddress][tokenId];
         require(loan.isActive, "Loan is not active");
         require(msg.sender == loan.borrower, "Only the borrower can repay the loan");
+        uint256 senderBalance = loanToken.balanceOf(msg.sender);
+        require(senderBalance >= loan.loanAmount, "Insufficient loan token balance to repay the loan");
         loanToken.transferFrom(msg.sender, address(this), loan.loanAmount);
         IERC721(nftAddress).transferFrom(address(this), msg.sender, tokenId);
         loan.isActive = false;
@@ -84,8 +86,8 @@ contract NFTCollateralLoanIssuer is Ownable {
         _original_NFTCollateralLoanIssuer_liquidateNFT(nftAddress, tokenId);
         unchecked {
             if (!(loans[nftAddress][tokenId].isActive == false)) {
-                emit __ScribbleUtilsLib__3238.AssertionFailedData(7, abi.encode(nftAddress, tokenId));
-                emit __ScribbleUtilsLib__3238.AssertionFailed("004346:0068:001 7: ");
+                emit __ScribbleUtilsLib__3254.AssertionFailedData(7, abi.encode(nftAddress, tokenId));
+                emit __ScribbleUtilsLib__3254.AssertionFailed("004515:0068:001 7: ");
             }
         }
     }
@@ -99,7 +101,7 @@ contract NFTCollateralLoanIssuer is Ownable {
     }
 }
 
-library __ScribbleUtilsLib__3238 {
+library __ScribbleUtilsLib__3254 {
     event AssertionFailed(string message);
 
     event AssertionFailedData(int eventId, bytes encodingData);

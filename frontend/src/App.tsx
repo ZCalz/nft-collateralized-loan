@@ -4,10 +4,12 @@ import { ethers } from 'ethers';
 import toast, { Toaster } from 'react-hot-toast';
 
 type LoanInfo = {
-  borrower: string
-  loanAmount: number
-  nftAddress: string
-  tokenId: number
+  loanId: number,
+  borrower: string,
+  loanAmount: number,
+  nftAddress: string,
+  tokenId: number,
+  isActive?: boolean,
 }
 
 export default function App() {
@@ -22,11 +24,19 @@ export default function App() {
   const [selectedNFT, setSelectedNFT] = useState<string | undefined>(undefined);
   const [userLoanInfo, setUserLoanInfo] = useState<LoanInfo[] | undefined>(undefined);
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const [selectedLoan, setSelectedLoan] = useState<string | undefined>(undefined);
+
+  const handleChangeNFT = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     setSelectedNFT(value);
   };
   console.log("selectedNFT: ", selectedNFT)
+
+  const handleChangeLoan = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedLoan(value);
+  };
+  console.log("selectedLoan: ", JSON.stringify(selectedLoan))
 
   const collateralizeNFT = async (nftTokenId: number, loanAmount: number) => {
     const amt = ethers.utils.parseEther(String(loanAmount))
@@ -45,6 +55,37 @@ export default function App() {
     }
   };
 
+  const repayLoan = async (stringParams: string) => {
+    const [loanId, loanAmount, nftTokenId, nftAddress] = stringParams.split(':')
+
+    console.log(loanId, loanAmount, nftTokenId, nftAddress)
+    if (loanId === undefined || loanId === "None" &&
+      loanAmount === undefined || loanAmount === "None" &&
+      nftTokenId === undefined || nftTokenId === "None" && 
+      nftAddress === undefined || nftAddress === "None"
+    ) {
+      toast.error('Invalid Parameters: Select from available collateralized nfts to repay loan');
+      console.error("Params:", nftAddress, nftTokenId);
+      return
+    }
+    if (loanTokenTxContract && nftCollateralLoanIssuerTxContract) {
+      try { 
+        const amt = ethers.utils.parseEther(String(loanAmount))
+        const approveTx = await loanTokenTxContract.approve(nftCollateralLoanIssuerTxContract.address, amt);
+        approveTx.wait()
+        toast.success('Approved repay amount');
+        
+        const repayLoanTx = await nftCollateralLoanIssuerTxContract.repayLoan(nftAddress, nftTokenId);
+        const result = repayLoanTx.wait()
+        console.log(result);
+        toast.success('Repaid Loan');
+      } catch (error) {
+        console.error("Error Repaying Loan:", error);
+        toast.error('Error Repaying Loan');
+      }
+    }
+  };
+
   const mintNFT = async () => {
     if (account && nftTxContract) {
       try { 
@@ -57,6 +98,35 @@ export default function App() {
       }
     }
   };
+
+  const mintLoanTokens = async (amount: number = 1000) => {
+    const amt = ethers.utils.parseEther(String(amount))
+    if (account && loanTokenTxContract) {
+      try { 
+        const mintTx = await loanTokenTxContract.mint(account, amt);
+        mintTx.wait()
+        toast.success(`minted ${amount} tokens`);
+      } catch (error) {
+        console.error("Error mint tokens:", error);
+        toast.error('Error mint tokens');
+      }
+    }
+  };
+
+  const burnLoanTokens = async (amount: number = 300) => {
+    const amt = ethers.utils.parseEther(String(amount))
+    if (account && loanTokenTxContract) {
+      try { 
+        const mintTx = await loanTokenTxContract.burn(amt);
+        mintTx.wait()
+        toast.success(`burned ${amount} tokens`);
+      } catch (error) {
+        console.error("Error burning tokens:", error);
+        toast.error('Error burning tokens');
+      }
+    }
+  };
+
 
   useEffect(() => {
     if (nftTxContract && account) {
@@ -112,13 +182,16 @@ export default function App() {
           const issuerAddress = nftCollateralLoanIssuerTxContract.address
           console.log("issuerAddress: ", issuerAddress);
 
-          const events: ethers.Event[] = await nftCollateralLoanIssuerTxContract.queryFilter("LoanCreated", 0, "latest");
+          const createdEvents: ethers.Event[] = await nftCollateralLoanIssuerTxContract.queryFilter("LoanCreated", 0, "latest");
+          const repaidEvents: ethers.Event[] = await nftCollateralLoanIssuerTxContract.queryFilter("LoanRepaid", 0, "latest");
+
           const loans: LoanInfo[] = [];
-          events.forEach((event: ethers.Event) => {
+          createdEvents.forEach((event: ethers.Event) => {
             if (event && event.args) {
-              const { borrower, loanAmount, nftAddress, tokenId } = event.args
-              console.log({borrower, loanAmount, nftAddress, tokenId})
+              const { borrower, loanAmount, nftAddress, tokenId, loanId } = event.args
+              console.log({borrower, loanAmount, nftAddress, tokenId, loanId})
               const loanInfo: LoanInfo = {
+                loanId: Number(loanId),
                 borrower: borrower,
                 loanAmount: Number(ethers.utils.formatEther(loanAmount)),
                 nftAddress: nftAddress,
@@ -128,7 +201,18 @@ export default function App() {
             }
           });
 
-          setUserLoanInfo(loans)
+          const repaidLoans = repaidEvents.map((event: ethers.Event) => {
+            if (event && event.args) {
+              const { loanId } = event.args
+              return Number(loanId)
+            }
+          })
+          console.log("repaidLoans: ", repaidLoans)
+
+          const filteredLoans = loans.filter(loan => !repaidLoans.includes(loan.loanId))
+          console.log("filtered: ", filteredLoans)
+
+          setUserLoanInfo(filteredLoans)
         } catch (err) {
           console.error(err)
         }
@@ -162,7 +246,8 @@ export default function App() {
             <h2 className="font-bold">Your Loans</h2>
             <div className="p-4">
               {userLoanInfo && userLoanInfo.map((loan, key) => {
-                return<div key={key} className="bg-yellow-800 p-4 rounded-md shadow-md">
+                return<div key={key} className="bg-yellow-800 p-4 rounded-md shadow-md m-2">
+                  <p>LoanId: {loan.loanId}</p>
                   <p>Borrower: {loan.borrower}</p>
                   <p>LoanAmount: {loan.loanAmount}</p>
                   <p>NftAddress: {loan.nftAddress}</p>
@@ -180,7 +265,7 @@ export default function App() {
               <select
                 id="options"
                 value={selectedNFT}
-                onChange={handleChange}
+                onChange={handleChangeNFT}
                 className="block text-black w-full py-2 border border-gray-300 rounded-md"
               >
                 {userNFTs && ["None",...userNFTs].map((option, index) => (
@@ -197,7 +282,20 @@ export default function App() {
           <div className="w-full h-full p-4">
             <h2 className="font-bold">Repay Your Loan</h2>
             <div className="p-4">
-              {}
+              <label htmlFor="options" className="block mt-4 my-2 text-sm font-medium text-gray-900">Choose an nft to collateralize:</label>
+                <select
+                  id="options"
+                  value={selectedLoan}
+                  onChange={handleChangeLoan}
+                  className="block text-black w-full py-2 border border-gray-300 rounded-md"
+                >
+                  {userLoanInfo && [undefined,...userLoanInfo].map((option, index) => (
+                    <option key={index} value={option?`${option.loanId}:${option.loanAmount}:${option.tokenId}:${option.nftAddress}`: undefined}>
+                      {option? `ID: ${option.loanId}, Loan: ${option.loanAmount}, TokenId: ${option.tokenId}, NFT Address: ${option.nftAddress}`: `None` }
+                    </option>
+                  ))}
+                </select>
+                <button className="bg-orange-600 p-4 px-8 rounded-md shadow-md" onClick={selectedLoan? ()=>repayLoan(selectedLoan): undefined} >Submit</button>
             </div>
           </div>
         </div>
@@ -211,9 +309,8 @@ export default function App() {
             </div>
             <div className="flex justify-evenly text-gray-200 gap-6 flex-col sm:flex-row">
               <button onClick={()=>mintNFT()} className="bg-green-600 p-8 rounded-md shadow-md">Mint NFT</button>
-              <button className="bg-pink-600 p-8 rounded-md shadow-md">Burn 10000 of Your Loan Tokens</button>
-              <button className="bg-pink-600 p-8 rounded-md shadow-md">Burn All Your Loan Tokens</button>
-              <button className="bg-pink-600 p-8 rounded-md shadow-md">Mint Yourself 10000 Loan Tokens</button>
+              <button onClick={()=>burnLoanTokens()} className="bg-pink-600 p-8 rounded-md shadow-md">Burn 300 of Your Loan Tokens</button>
+              <button onClick={()=>mintLoanTokens()} className="bg-pink-600 p-8 rounded-md shadow-md">Mint Yourself 1000 Loan Tokens</button>
             </div>
           </div>
         </div>
