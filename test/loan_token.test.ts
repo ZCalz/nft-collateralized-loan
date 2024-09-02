@@ -1,4 +1,3 @@
-
 import { LoanTokenInstance, LoanTokenContract } from '../types/truffle-contracts/LoanToken';
 const LoanToken: LoanTokenContract = artifacts.require("LoanToken");
 
@@ -46,5 +45,27 @@ contract("LoanToken", async (accounts) => {
 
     assert.strictEqual(deployerBalance.toString(), initialSupply.mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))).sub(approveAmount).toString());
     assert.strictEqual(recipientBalance.toString(), approveAmount.toString());
+  });
+
+  it("should allow minting of new tokens", async () => {
+    const mintAmount: BN = web3.utils.toBN('500').mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))); // 500 tokens
+    await loanToken.mint(recipient, mintAmount, { from: deployer });
+
+    const recipientBalance: BN = await loanToken.balanceOf(recipient);
+    const totalSupply: BN = await loanToken.totalSupply();
+
+    assert.strictEqual(recipientBalance.toString(), mintAmount.toString());
+    assert.strictEqual(totalSupply.toString(), initialSupply.mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))).add(mintAmount).toString());
+  });
+
+  it("should allow burning of tokens", async () => {
+    const burnAmount: BN = web3.utils.toBN('500').mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))); // 500 tokens
+    await loanToken.burn(burnAmount, { from: deployer });
+
+    const deployerBalance: BN = await loanToken.balanceOf(deployer);
+    const totalSupply: BN = await loanToken.totalSupply();
+
+    assert.strictEqual(deployerBalance.toString(), initialSupply.mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))).sub(burnAmount).toString());
+    assert.strictEqual(totalSupply.toString(), initialSupply.mul(web3.utils.toBN('10').pow(web3.utils.toBN('18'))).sub(burnAmount).toString());
   });
 });

@@ -39,6 +39,20 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     await loanToken.transfer(nftCollateralLoanIssuer.address, loanAmount, { from: owner });
   });
 
+  it("should not allow collateralization if there are not enough tokens available for loan", async () => {
+    const excessiveLoanAmount = web3.utils.toWei('1000', 'ether');
+
+    // Approve the NFTCollateralLoanIssuer contract to transfer the borrower's NFT
+    await nft.approve(nftCollateralLoanIssuer.address, nftTokenId, { from: borrower });
+
+    // Attempt to collateralize the NFT (should fail due to insufficient tokens)
+    await truffleAssert.fails(
+      nftCollateralLoanIssuer.collateralizeNFT(nft.address, nftTokenId, excessiveLoanAmount, { from: borrower }),
+      truffleAssert.ErrorType.REVERT,
+      "Not enough tokens available to create a loan"
+    );
+  });
+
   it("should allow the borrower to collateralize an NFT and receive a loan", async () => {
     // Approve the NFTCollateralLoanIssuer contract to transfer the borrower's NFT
     await nft.approve(nftCollateralLoanIssuer.address, nftTokenId, { from: borrower });

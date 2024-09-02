@@ -12,7 +12,7 @@ contract LoanToken is ERC20 {
         _mint(to, amount);
     }
 
-    function burn(uint256 amount) external {
+    function burn(uint256 amount) external { // only for testing purposes (normally only owner can burn their own tokens)
         _burn(msg.sender, amount);
     }
 }
