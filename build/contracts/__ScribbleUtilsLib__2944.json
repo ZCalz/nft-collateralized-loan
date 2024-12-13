@@ -3026,7 +3026,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.16",
-  "updatedAt": "2024-09-02T04:07:59.101Z",
+  "updatedAt": "2024-09-02T10:10:05.746Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
@@ -3045,7 +3045,7 @@
       "id": "0x941af9f29d0974cb95680c8d9ace8dcadcfa04c90c8330b86432573595566453"
     },
     "contract": {
-      "id": "0x478e8700e002369909a939f9b4aa203b8eb622ae152833318171ec676c4be6d6"
+      "id": "0x643425b86022e6eec7e46901c501450300975eaf0552691b347368c283233d24"
     }
   }
 }
