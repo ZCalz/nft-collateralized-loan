@@ -44,7 +44,7 @@ require("ts-node").register({
   files: true,
 });
 require('dotenv').config(); 
-const { PK, PROJECT_ID } = process.env;
+const { PK, PROJECT_ID, ALCHEMY_PROJECT_ID } = process.env;
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
@@ -69,7 +69,7 @@ module.exports = {
     // development: {
     //  host: "127.0.0.1",     // Localhost (default: none)
     //  port: 7545,            // Standard Ethereum port (default: none)
-    //  network_id: "*",       // Any network (default: none)
+    //  network_id: "1337",       // Any network (default: none)
     // },
     development2: {
       host: "127.0.0.1",     // Localhost (default: none)
@@ -90,7 +90,7 @@ module.exports = {
     sepolia: {
       provider: () => new HDWalletProvider({
         privateKeys: [`${PK}`], // Replace with your private key
-        providerOrUrl: `https://sepolia.infura.io/v3/${PROJECT_ID}` 
+        providerOrUrl: `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_PROJECT_ID}` 
       }),
       network_id: 11155111,  
       gas: 9000000,    
