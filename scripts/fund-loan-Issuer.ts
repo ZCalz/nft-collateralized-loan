@@ -19,8 +19,10 @@ module.exports = async function (callback: any) {
 
     const NFTCollateralLoanIssuer: NFTCollateralLoanIssuerContract = artifacts.require("NFTCollateralLoanIssuer");
     const issuerAddress = NFTCollateralLoanIssuer.address;
+
+    const amountWei = web3.utils.toWei(amount, 'ether'); 
     
-    await instance.mint(issuerAddress, amount)
+    await instance.mint(issuerAddress, amountWei)
 
     console.log(`${amount} tokens minted to Issuer: ${issuerAddress}`);
 

@@ -11,6 +11,7 @@ contract NFTCollateralLoanIssuer is Ownable {
 
     // Structure to keep track of loan details
     struct Loan {
+        uint256 loanId;
         address borrower;
         uint256 nftTokenId;
         uint256 loanAmount;
@@ -20,14 +21,18 @@ contract NFTCollateralLoanIssuer is Ownable {
     // Mapping to track loans by NFT address and token ID
     mapping(address => mapping(uint256 => Loan)) public loans;
 
+    // Counter for generating unique loan IDs
+    uint256 public nextLoanId;
+
     // Events
-    event LoanCreated(address indexed borrower, address indexed nftAddress, uint256 indexed tokenId, uint256 loanAmount);
-    event LoanRepaid(address indexed borrower, address indexed nftAddress, uint256 indexed tokenId);
-    event NFTLiquidated(address indexed nftAddress, uint256 indexed tokenId);
+    event LoanCreated(address indexed borrower, address indexed nftAddress, uint256 indexed tokenId, uint256 loanId, uint256 loanAmount);
+    event LoanRepaid(address indexed borrower, address indexed nftAddress, uint256 indexed tokenId, uint256 loanId);
+    event NFTLiquidated(address indexed nftAddress, uint256 indexed tokenId, uint256 loanId);
 
     // Constructor to set the ERC20 token address
     constructor(IERC20 _loanToken) {
         loanToken = _loanToken;
+        nextLoanId = 1; // Start loan IDs from 1
     }
 
     /// #if_succeeds loans[nftAddress][tokenId].isActive == false;
@@ -40,30 +45,42 @@ contract NFTCollateralLoanIssuer is Ownable {
         // Ensure the NFT is not already collateralized
         require(!loans[nftAddress][tokenId].isActive, "NFT is already collateralized");
 
+        // Ensure enough loan tokens to loan
+        uint256 contractBalance = loanToken.balanceOf(address(this));
+        require(contractBalance >= loanAmount, "Not enough tokens available to create a loan");
+
         // Transfer the NFT from the borrower to this contract as collateral
         IERC721(nftAddress).transferFrom(msg.sender, address(this), tokenId);
 
         // Create the loan and mark it as active
         loans[nftAddress][tokenId] = Loan({
+            loanId: nextLoanId,
             borrower: msg.sender,
             nftTokenId: tokenId,
             loanAmount: loanAmount,
             isActive: true
         });
 
+        // Increment the loan ID counter for the next loan
+        nextLoanId++;
+
         // Transfer the loan amount in ERC20 tokens to the borrower
         loanToken.transfer(msg.sender, loanAmount);
 
-        emit LoanCreated(msg.sender, nftAddress, tokenId, loanAmount);
+        emit LoanCreated(msg.sender, nftAddress, tokenId, loans[nftAddress][tokenId].loanId, loanAmount);
     }
 
     /// #if_succeeds loans[nftAddress][tokenId].isActive == false;
     /// #if_succeeds msg.sender == loans[nftAddress][tokenId].borrower;
     function repayLoan(address nftAddress, uint256 tokenId) external {
-        Loan memory loan = loans[nftAddress][tokenId];
+        Loan storage loan = loans[nftAddress][tokenId];
 
         require(loan.isActive, "Loan is not active");
         require(msg.sender == loan.borrower, "Only the borrower can repay the loan");
+
+        // Check that msg.sender has enough loan tokens to repay the loan
+        uint256 senderBalance = loanToken.balanceOf(msg.sender);
+        require(senderBalance >= loan.loanAmount, "Insufficient loan token balance to repay the loan");
 
         // Transfer the loan amount back to the contract
         loanToken.transferFrom(msg.sender, address(this), loan.loanAmount);
@@ -72,22 +89,22 @@ contract NFTCollateralLoanIssuer is Ownable {
         IERC721(nftAddress).transferFrom(address(this), msg.sender, tokenId);
 
         // Mark the loan as inactive
-        loans[nftAddress][tokenId].isActive = false;
+        loan.isActive = false;
 
-        emit LoanRepaid(msg.sender, nftAddress, tokenId);
+        emit LoanRepaid(msg.sender, nftAddress, tokenId, loan.loanId);
     }
 
     /// #if_succeeds loans[nftAddress][tokenId].isActive == false;
     function liquidateNFT(address nftAddress, uint256 tokenId) external onlyOwner {
-        Loan memory loan = loans[nftAddress][tokenId];
+        Loan storage loan = loans[nftAddress][tokenId];
         require(loan.isActive, "Loan is not active");
 
         // Transfer the NFT to the contract owner
         IERC721(nftAddress).transferFrom(address(this), owner(), tokenId);
 
         // Mark the loan as inactive
-        loans[nftAddress][tokenId].isActive = false;
+        loan.isActive = false;
 
-        emit NFTLiquidated(nftAddress, tokenId);
+        emit NFTLiquidated(nftAddress, tokenId, loan.loanId);
     }
 }

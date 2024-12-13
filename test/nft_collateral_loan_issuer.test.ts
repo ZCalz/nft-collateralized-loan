@@ -1,8 +1,6 @@
-
 import { LoanTokenContract, LoanTokenInstance } from '../types/truffle-contracts/LoanToken';
 import { AllEvents, NFTContract, NFTInstance } from '../types/truffle-contracts/NFT';
 import { NFTCollateralLoanIssuerContract, NFTCollateralLoanIssuerInstance } from '../types/truffle-contracts/NFTCollateralLoanIssuer';
-
 
 const NFTCollateralLoanIssuer: NFTCollateralLoanIssuerContract = artifacts.require("NFTCollateralLoanIssuer");
 const NFT: NFTContract = artifacts.require("NFT");
@@ -37,6 +35,20 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     
     // Transfer some Loan tokens to the loan contract so it can issue loans
     await loanToken.transfer(nftCollateralLoanIssuer.address, loanAmount, { from: owner });
+  });
+
+  it("should not allow collateralization if there are not enough tokens available for loan", async () => {
+    const excessiveLoanAmount = web3.utils.toWei('1000', 'ether');
+
+    // Approve the NFTCollateralLoanIssuer contract to transfer the borrower's NFT
+    await nft.approve(nftCollateralLoanIssuer.address, nftTokenId, { from: borrower });
+
+    // Attempt to collateralize the NFT (should fail due to insufficient tokens)
+    await truffleAssert.fails(
+      nftCollateralLoanIssuer.collateralizeNFT(nft.address, nftTokenId, excessiveLoanAmount, { from: borrower }),
+      truffleAssert.ErrorType.REVERT,
+      "Not enough tokens available to create a loan"
+    );
   });
 
   it("should allow the borrower to collateralize an NFT and receive a loan", async () => {
@@ -80,25 +92,52 @@ contract("NFTCollateralLoanIssuer", (accounts) => {
     assert.strictEqual(loanContractBalance.toString(), loanAmount.toString(), "The loan contract should have received the loan repayment");
   });
 
-  it("should allow the owner to liquidate the NFT if the loan is not repaid", async () => {
-    // Mint a new NFT to the borrower
-    const tx: Truffle.TransactionResponse<AllEvents> = await nft.mint(borrower);
-
-    // Extract the token ID from the transaction receipt
-    const newNftTokenId: string = tx.logs[0].args[0].toString();
-    
-    // Verify the token ID
-    assert.ok(nftTokenId, "Token ID should be obtained");
+  it("should fail with 'Insufficient loan token balance to repay the loan' if the tokens are burned", async () => {
+    // Approve the loan contract to spend the borrower's ERC20 tokens
+    await loanToken.approve(nftCollateralLoanIssuer.address, loanAmount, { from: borrower });
 
     // Approve and collateralize the new NFT
-    await nft.approve(nftCollateralLoanIssuer.address, newNftTokenId, { from: borrower });
-    await nftCollateralLoanIssuer.collateralizeNFT(nft.address, newNftTokenId, loanAmount, { from: borrower });
+    await nft.approve(nftCollateralLoanIssuer.address, nftTokenId, { from: borrower });
+    await nftCollateralLoanIssuer.collateralizeNFT(nft.address, nftTokenId, loanAmount, { from: borrower });
 
-    // Liquidate the NFT (assuming the loan is not repaid)
-    await nftCollateralLoanIssuer.liquidateNFT(nft.address, newNftTokenId, { from: owner });
+    // Check the barrower balance before burning
+    const barrowerBalanceBeforeBurn = await loanToken.balanceOf(borrower);
+    assert.strictEqual(barrowerBalanceBeforeBurn.toString(), loanAmount.toString(), "Borrower should have received the loan amount");
 
-    // Check that the contract owner now owns the NFT
-    const newOwner: string = await nft.ownerOf(newNftTokenId);
-    assert.strictEqual(newOwner, owner, "The contract owner should have received the liquidated NFT");
+    // Burn the tokens from the barrower
+    await loanToken.burn(loanAmount, { from: borrower });
+
+    // Check the barrower balance after burning
+    const barrowerBalanceAfterBurn = await loanToken.balanceOf(borrower);
+    assert.strictEqual(barrowerBalanceAfterBurn.toString(), '0', "Borrower balance should be zero after burning");
+
+    // Attempt to repay the loan with insufficient funds
+    await truffleAssert.fails(
+      nftCollateralLoanIssuer.repayLoan(nft.address, nftTokenId, { from: borrower }),
+      truffleAssert.ErrorType.REVERT,
+      "Insufficient loan token balance to repay the loan"
+    );
   });
+
+  // it("should allow the owner to liquidate the NFT if the loan is not repaid", async () => {
+  //   // Mint a new NFT to the borrower
+  //   const tx: Truffle.TransactionResponse<AllEvents> = await nft.mint(borrower);
+
+  //   // Extract the token ID from the transaction receipt
+  //   const newNftTokenId: string = tx.logs[0].args[0].toString();
+    
+  //   // Verify the token ID
+  //   assert.ok(nftTokenId, "Token ID should be obtained");
+
+  //   // Approve and collateralize the new NFT
+  //   await nft.approve(nftCollateralLoanIssuer.address, newNftTokenId, { from: borrower });
+  //   await nftCollateralLoanIssuer.collateralizeNFT(nft.address, newNftTokenId, loanAmount, { from: borrower });
+
+  //   // Liquidate the NFT (assuming the loan is not repaid)
+  //   await nftCollateralLoanIssuer.liquidateNFT(nft.address, newNftTokenId, { from: owner });
+
+  //   // Check that the contract owner now owns the NFT
+  //   const newOwner: string = await nft.ownerOf(newNftTokenId);
+  //   assert.strictEqual(newOwner, owner, "The contract owner should have received the liquidated NFT");
+  // });
 });

@@ -46,12 +46,13 @@ contract("NFT", accounts => {
     assert.strictEqual(baseURI, newURI, "Base URI should be updated correctly");
   });
 
-  // it("should not allow non-owners to set base URI", async () => {
-  //   await truffleAssert.reverts(
-  //     nft.setBaseURI("https://malicious-uri.xyz/", { from: nonOwner }),
-  //     "Ownable: caller is not the owner"
-  //   );
-  // });
+  it("should not allow non-owners to set base URI", async () => {
+
+    await truffleAssert.fails(
+      nft.setBaseURI("https://malicious-uri.xyz/", { from: nonOwner }),
+      truffleAssert.ErrorType.REVERT
+    );
+  });
 
   it("should return the correct base URI", async () => {
     const initialURI: string = await nft.baseURI();
